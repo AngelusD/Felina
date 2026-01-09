@@ -1,6 +1,4 @@
-# Static copy of tiliopoulou.com
 
-This folder contains a plain static copy scaffold of https://www.tiliopoulou.com.
 
 Files created:
 - `index.html` — home page
