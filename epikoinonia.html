@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="el">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Επικοινωνία — Τριανταφυλλιά Ηλιοπούλου</title>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Μετάβαση στο περιεχόμενο</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html"><img src="assets/newlogo.png" alt="Λογότυπο" class="logo"><span class="brand-text">Τριανταφυλλιά Ηλιοπούλου</span></a>
+      <button id="navToggle" class="nav-toggle" aria-expanded="false">☰</button>
+      <nav class="main-nav" id="mainNav" role="navigation" aria-label="Primary navigation">
+        <ul>
+          <li><a href="index.html">Αρχική</a></li>
+          <li><a href="viografiko.html">Βιογραφικό</a></li>
+          <li><a href="proseggisi.html">Η Προσέγγιση</a></li>
+          <li><a href="psychotherapeia.html">Ψυχοθεραπεία / Ανάλυση</a></li>
+          <li><a href="epopteia.html">Εποπτεία</a></li>
+          <li><a href="dimosieuseis.html">Δημοσιεύσεις</a></li>
+          <li><a href="epikoinonia.html">Επικοινωνία</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="page-hero-figure">
+      <img src="assets/office-10.jpg" alt="Προβολή εισόδου και επικοινωνίας" style="object-position:50% 35%">
+    </div>
+    <div class="hero-overlay">
+      <div class="container">
+        <div class="hero-text">
+          <h1>Επικοινωνία</h1>
+          <p class="subtitle">Διεύθυνση, τηλέφωνα και φόρμα επικοινωνίας</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main id="main" role="main" class="container">
+
+    <section style="padding:26px 0 36px">
+      <h1>Επικοινωνία</h1>
+      <p><strong>Διεύθυνση</strong><br>Ολυμπίων 10, Άνω Πατήσια, Αθήνα 11143</p>
+      <p><strong>Τηλέφωνα</strong><br><a href="tel:+302130475953">2130475953</a><br><a href="tel:+306978552358">6978552358</a></p>
+      <p><strong>Email</strong><br><a href="mailto:felinahliop@gmail.com">felinahliop@gmail.com</a></p>
+
+      <h2>Στείλτε μήνυμα</h2>
+      <form id="contactForm" action="https://formspree.io/f/mbdjkeja" method="post" style="max-width:520px">
+        <input type="hidden" name="_subject" value="Νέο μήνυμα από την ιστοσελίδα">
+        <input type="hidden" id="_gotcha" name="_gotcha">
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <label class="sr-only" for="fname">Όνομα *</label>
+          <input id="fname" name="fname" placeholder="Όνομα *" required aria-required="true" style="flex:1;padding:10px;margin-bottom:8px">
+
+          <label class="sr-only" for="lname">Επώνυμο</label>
+          <input id="lname" name="lname" placeholder="Επώνυμο" style="flex:1;padding:10px;margin-bottom:8px">
+        </div>
+
+        <label class="sr-only" for="email">Email *</label>
+        <input id="email" name="email" type="email" placeholder="Email *" required aria-required="true" style="width:100%;padding:10px;margin-bottom:8px">
+
+        <label class="sr-only" for="message">Μήνυμα</label>
+        <textarea id="message" name="message" placeholder="Μήνυμα" rows="6" style="width:100%;padding:10px;margin-bottom:8px"></textarea>
+
+        <button type="submit" style="background:var(--accent);color:white;padding:10px 14px;border:0;border-radius:4px">Αποστολή</button>
+      </form>
+    </section>
+
+    <section class="page-bottom-figure container">
+      <img src="assets/office-14.jpg" alt="Λεπτομέρεια χώρου υποδοχής" loading="lazy">
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>© Τριανταφυλλιά Ηλιοπούλου</p></div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
