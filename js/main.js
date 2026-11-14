@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded',function(){
       <div class="lb-inner">
         <button class="lb-close" aria-label="Κλείσιμο">×</button>
         <button class="lb-prev" aria-label="Προηγούμενη εικόνα">‹</button>
-        <figure class="lb-figure"><img src="${src}" alt="${alt}"><figcaption class="lb-caption"></figcaption></figure>
+        <figure class="lb-figure"><img src="${src}" alt="${alt}"></figure>
         <button class="lb-next" aria-label="Επόμενη εικόνα">›</button>
       </div>
     `;
@@ -166,16 +166,13 @@ document.addEventListener('DOMContentLoaded',function(){
     const close = overlay.querySelector('.lb-close');
     const prev = overlay.querySelector('.lb-prev');
     const next = overlay.querySelector('.lb-next');
-    const captionEl = overlay.querySelector('.lb-caption');
 
     function update(){
       const g = items[index];
       const gimg = g ? g.querySelector('img') : null;
       if(!gimg) return;
-      const cap = g.querySelector('.caption')?.textContent || gimg.alt || '';
       imgEl.src = gimg.src;
       imgEl.alt = gimg.alt || '';
-      captionEl.textContent = cap;
       // hide prev/next if single or at ends
       prev.style.display = items.length > 1 ? 'block' : 'none';
       next.style.display = items.length > 1 ? 'block' : 'none';

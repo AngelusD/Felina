@@ -293,7 +293,7 @@ gallery = [
 ]
 gal_html = '\n'.join(
     f'        <button class="gallery-item reveal" type="button" data-index="{i}" aria-label="Μεγέθυνση: {alt}">'
-    f'{img(b, alt, sizes="(max-width:640px) 46vw, (max-width:1000px) 30vw, 280px")}<span class="caption">{alt}</span></button>'
+    f'{img(b, alt, sizes="(max-width:640px) 46vw, (max-width:1000px) 30vw, 280px")}</button>'
     for i, (b, alt) in enumerate(gallery))
 
 index_body = f'''    <section class="hero">
