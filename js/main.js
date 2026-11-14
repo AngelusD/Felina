@@ -1,4 +1,14 @@
+document.documentElement.classList.add('js');
 document.addEventListener('DOMContentLoaded',function(){
+  // Subtle reveal on scroll (CSS only hides content when motion is allowed)
+  const reveals = document.querySelectorAll('.reveal, .arch-wrap');
+  if('IntersectionObserver' in window && reveals.length){
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+    },{threshold:0.12});
+    reveals.forEach(el=>io.observe(el));
+  } else { reveals.forEach(el=>el.classList.add('in')); }
+
   const nav = document.getElementById('mainNav');
   const btn = document.getElementById('navToggle');
   if(nav && btn){
@@ -8,6 +18,10 @@ document.addEventListener('DOMContentLoaded',function(){
     });
   }
 
+  function showStatus(msg){
+    const el = document.getElementById('formStatus');
+    if(el){ el.textContent = msg; el.classList.add('err'); }
+  }
   const contactForm = document.getElementById('contactForm');
   if(contactForm){
     contactForm.addEventListener('submit', async (e) => {
@@ -33,16 +47,42 @@ document.addEventListener('DOMContentLoaded',function(){
         } else {
           const json = await resp.json();
           console.error(json);
-          alert('Σφάλμα στην αποστολή. Δοκιμάστε ξανά.');
+          showStatus('Σφάλμα στην αποστολή. Δοκιμάστε ξανά.');
           if(submitBtn){ submitBtn.disabled=false; submitBtn.textContent='Αποστολή'; }
         }
       }catch(err){
         console.error(err);
-        alert('Σφάλμα δικτύου. Δοκιμάστε ξανά.');
+        showStatus('Σφάλμα δικτύου. Δοκιμάστε ξανά.');
         if(submitBtn){ submitBtn.disabled=false; submitBtn.textContent='Αποστολή'; }
       }
     });
   }
+
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Header shadow/shrink and gentle photo parallax
+  const header = document.querySelector('.site-header');
+  let ticking = false;
+  function onScroll(){
+    if(ticking) return; ticking = true;
+    requestAnimationFrame(()=>{
+      header?.classList.toggle('scrolled', window.scrollY > 40);
+      if(!reduce){
+        document.querySelectorAll('.arch-wrap').forEach(w=>{
+          const r = w.getBoundingClientRect();
+          if(r.bottom < 0 || r.top > window.innerHeight) return;
+          const py = (r.top + r.height/2 - window.innerHeight/2) * -0.06;
+          w.style.setProperty('--py', Math.max(-20, Math.min(20, py)).toFixed(1));
+        });
+      }
+      ticking = false;
+    });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+  // Service icons: strokes draw themselves
+  document.querySelectorAll('.service svg *').forEach(el=>el.setAttribute('pathLength','1'));
 
   // Smooth scroll for in-page links (if any)
   document.querySelectorAll('a[href^="#"]').forEach(a=>{
@@ -88,7 +128,6 @@ document.addEventListener('DOMContentLoaded',function(){
         const box = document.createElement('div');
         box.className = 'contact-success-banner';
         box.innerHTML = '<strong>Το μήνυμά σας στάλθηκε.</strong> Θα επικοινωνήσουμε σύντομα.';
-        Object.assign(box.style,{background:'#e9f6ef',border:'1px solid #cfead8',padding:'12px 16px',borderRadius:'8px',marginBottom:'18px',color:'#0b6b3a'});
         const main = document.getElementById('main');
         main?.insertAdjacentElement('afterbegin', box);
         // remove query param to avoid showing repeatedly when refreshing
@@ -101,52 +140,16 @@ document.addEventListener('DOMContentLoaded',function(){
     }catch(e){/* ignore */}
   })();
 
-  // Hero focal-point helper: Alt+Click on a top hero image to set object-position (saves to localStorage).
-  // Alt+Shift+Click clears the saved focus for that image.
-  const heroImgs = document.querySelectorAll('.page-hero-figure img');
-  heroImgs.forEach(img => {
-    try{
-      const key = 'heroFocus:' + img.getAttribute('src');
-      const stored = localStorage.getItem(key);
-      if(stored) img.style.objectPosition = stored;
-
-      img.addEventListener('click', (e) => {
-        if(!e.altKey) return; // require Alt/Option to avoid interfering with normal clicks
-        e.preventDefault();
-        if(e.shiftKey){ // clear
-          localStorage.removeItem(key);
-          img.style.objectPosition = '50% 50%';
-          flashToast('Hero focal point cleared');
-          return;
-        }
-        const rect = img.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        const pos = `${Math.round(x)}% ${Math.round(y)}%`;
-        img.style.objectPosition = pos;
-        localStorage.setItem(key, pos);
-        flashToast('Hero focal point saved: ' + pos);
-      });
-    }catch(err){/* ignore */}
-  });
-
-  function flashToast(text){
-    const t = document.createElement('div');
-    t.className = 'hero-focus-toast';
-    t.textContent = text;
-    Object.assign(t.style,{position:'fixed',left:'16px',bottom:'16px',background:'#111',color:'#fff',padding:'8px 12px',borderRadius:'6px',zIndex:12000});
-    document.body.appendChild(t);
-    setTimeout(()=>t.remove(),1800);
-  }
-
   /* Lightbox with prev/next and keyboard navigation */
   function openLightbox(src, alt, startIndex = 0){
     const items = Array.from(document.querySelectorAll('.gallery-item'));
     if(!items.length) return;
     let index = typeof startIndex === 'number' && !isNaN(startIndex) ? startIndex : 0;
 
+    const opener = document.activeElement;
     const overlay = document.createElement('div');
     overlay.className = 'lb-overlay';
+    overlay.setAttribute('role','dialog'); overlay.setAttribute('aria-modal','true'); overlay.setAttribute('aria-label','Φωτογραφίες του χώρου');
     overlay.tabIndex = -1;
     overlay.innerHTML = `
       <div class="lb-inner">
@@ -181,6 +184,7 @@ document.addEventListener('DOMContentLoaded',function(){
     function remove(){
       overlay.remove();
       document.removeEventListener('keydown', onKey);
+      if(opener && opener.focus) opener.focus();
     }
 
     function onKey(e){
