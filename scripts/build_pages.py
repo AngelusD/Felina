@@ -66,6 +66,11 @@ NAV = [
 
 
 PRELOAD = '  <link rel="preload" as="image" type="image/webp" href="assets/web/office-1-1200.webp" imagesrcset="assets/web/office-1-600.webp 600w, assets/web/office-1-1200.webp 1200w, assets/web/office-1-2000.webp 2000w" imagesizes="(max-width:900px) 80vw, 440px" fetchpriority="high">\n'
+import hashlib
+def _ver(path):
+    return hashlib.md5(open(path, 'rb').read()).hexdigest()[:8]
+
+
 PRIVACY = ('politiki-aporritou.html', 'Πολιτική Απορρήτου')
 SITE = 'https://www.tiliopoulou.com'   # assumed live domain (from README); change here if different
 OG_IMAGE = SITE + '/assets/web/og-index.jpg'   # default; each page uses og-<page>.jpg
@@ -167,7 +172,7 @@ def shell(fname, title, body, desc):
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v={_ver("css/styles.css")}">
 </head>
 <body>
   <a class="skip-link" href="#main">Μετάβαση στο περιεχόμενο</a>
@@ -220,7 +225,7 @@ def shell(fname, title, body, desc):
     </div>
   </footer>
 
-  <script src="js/main.js"></script>
+  <script src="js/main.js?v={_ver("js/main.js")}"></script>
 </body>
 </html>
 '''
