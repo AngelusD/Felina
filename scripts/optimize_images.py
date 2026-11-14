@@ -61,4 +61,11 @@ icon = Image.new('RGB', (180, 180), (247, 245, 241))
 m = lg.copy(); m.thumbnail((124, 124))
 icon.paste(m, ((180 - m.width) // 2, (180 - m.height) // 2), m)
 icon.save(f'{OUT}/apple-touch-icon.png', optimize=True)
+# social-sharing images (1200x630), one per page
+OG = {'index': 'office-1', 'viografiko': 'office-5', 'proseggisi': 'office-10', 'psychotherapeia': 'office-9',
+      'epopteia': 'office-12', 'dimosieuseis': 'office-4', 'epikoinonia': 'contact', 'politiki-aporritou': 'office-1'}
+for page, src in OG.items():
+    im = ImageOps.exif_transpose(Image.open(os.path.join(SRC, src + '.jpg'))).convert('RGB')
+    im = ImageOps.fit(im, (1200, 630), Image.LANCZOS, centering=(0.5, 0.5))
+    im.save(f'{OUT}/og-{page}.jpg', quality=80, optimize=True, progressive=True)
 print('done')

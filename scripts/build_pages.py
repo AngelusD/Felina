@@ -65,13 +65,16 @@ NAV = [
 ]
 
 
+PRELOAD = '  <link rel="preload" as="image" type="image/webp" href="assets/web/office-1-1200.webp" imagesrcset="assets/web/office-1-600.webp 600w, assets/web/office-1-1200.webp 1200w, assets/web/office-1-2000.webp 2000w" imagesizes="(max-width:900px) 80vw, 440px" fetchpriority="high">\n'
 PRIVACY = ('politiki-aporritou.html', 'Πολιτική Απορρήτου')
 SITE = 'https://www.tiliopoulou.com'   # assumed live domain (from README); change here if different
-OG_IMAGE = SITE + '/assets/web/office-1-1200.jpg'
+OG_IMAGE = SITE + '/assets/web/og-index.jpg'   # default; each page uses og-<page>.jpg
 
 import json
 def seo_head(fname, title, desc):
     url = SITE + '/' if fname == 'index.html' else f'{SITE}/{fname}'
+    key = fname[:-5]
+    og_img = f'{SITE}/assets/web/og-{key}.jpg' if os.path.exists(f'assets/web/og-{key}.jpg') else OG_IMAGE
     og_type = 'website'
     org = {
         '@type': ['ProfessionalService', 'LocalBusiness'],
@@ -79,6 +82,8 @@ def seo_head(fname, title, desc):
         'name': 'Δρ Ηλιοπούλου Τριανταφυλλιά — Ψυχοθεραπεύτρια',
         'url': SITE + '/',
         'image': OG_IMAGE,
+        'hasMap': 'https://www.google.com/maps/search/?api=1&query=Ολυμπίων+10+Άνω+Πατήσια+11143',
+        'availableLanguage': 'el',
         'logo': SITE + '/assets/web/mark.png',
         'telephone': ['+302130475953', '+306978552358'],
         'email': 'felinahliop@gmail.com',
@@ -98,6 +103,19 @@ def seo_head(fname, title, desc):
     }
     graph = [org, person,
              {'@type': 'WebSite', '@id': SITE + '/#website', 'url': SITE + '/', 'name': 'Τριανταφυλλιά Ηλιοπούλου — Ψυχολόγος/ Ψυχοθεραπεύτρια', 'inLanguage': 'el'}]
+    PT = {'viografiko.html': 'AboutPage', 'epikoinonia.html': 'ContactPage', 'dimosieuseis.html': 'CollectionPage'}
+    graph.append({'@type': PT.get(fname, 'WebPage'), '@id': url + '#webpage', 'url': url, 'name': title.replace('&amp;', '&'),
+                  'description': desc.replace('&amp;', '&'), 'inLanguage': 'el',
+                  'isPartOf': {'@id': SITE + '/#website'}, 'about': {'@id': SITE + '/#practice'},
+                  'primaryImageOfPage': {'@type': 'ImageObject', 'url': og_img, 'width': 1200, 'height': 630}})
+    def svc(sid, name, typ, desc_):
+        return {'@type': 'Service', '@id': f'{SITE}/{fname}#{sid}', 'name': name, 'serviceType': typ, 'description': desc_,
+                'provider': {'@id': SITE + '/#practice'}, 'areaServed': {'@type': 'City', 'name': 'Αθήνα'}, 'availableLanguage': 'el'}
+    if fname == 'psychotherapeia.html':
+        graph += [svc('psychotherapy', 'Ψυχοθεραπεία', 'Ατομική ψυχοθεραπεία ενηλίκων', 'Ατομικές συνεδρίες ψυχοθεραπείας για ενήλικες, διάρκειας 45 λεπτών, δια ζώσης ή διαδικτυακά.'),
+                  svc('psychoanalysis', 'Ψυχανάλυση', 'Ατομική ψυχανάλυση ενηλίκων', 'Ατομικές συνεδρίες ψυχανάλυσης για ενήλικες, διάρκειας 90 λεπτών, δια ζώσης ή διαδικτυακά.')]
+    if fname == 'epopteia.html':
+        graph += [svc('supervision', 'Εποπτεία', 'Εποπτεία επαγγελματιών ψυχοθεραπείας', 'Ατομική εποπτεία 60 λεπτών και ομαδική εποπτεία 90 λεπτών (3-4 άτομα, εβδομαδιαία), δια ζώσης ή διαδικτυακά.')]
     if fname != 'index.html':
         page_name = title.split(' — ')[0]
         graph.append({'@type': 'BreadcrumbList', 'itemListElement': [
@@ -106,8 +124,9 @@ def seo_head(fname, title, desc):
     ld = json.dumps({'@context': 'https://schema.org', '@graph': graph}, ensure_ascii=False, indent=1)
     t = title.replace('&amp;', '&')
     d = desc
+    CANON = '' if fname == '404.html' else f'<link rel="canonical" href="{url}">\n  '
     ROBOTS = 'noindex' if fname == '404.html' else 'index, follow, max-image-preview:large'
-    return f'''  <link rel="canonical" href="{url}">
+    return f'''  {CANON}<link rel="alternate" hreflang="el" href="{url}">
   <meta name="robots" content="{ROBOTS}">
   <meta name="author" content="Τριανταφυλλιά Ηλιοπούλου">
   <meta property="og:type" content="{og_type}">
@@ -116,12 +135,14 @@ def seo_head(fname, title, desc):
   <meta property="og:title" content="{t}">
   <meta property="og:description" content="{d}">
   <meta property="og:url" content="{url}">
-  <meta property="og:image" content="{OG_IMAGE}">
+  <meta property="og:image" content="{og_img}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Το γραφείο: τιρκουάζ πολυθρόνες σε ξύλινο δάπεδο">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{t}">
   <meta name="twitter:description" content="{d}">
-  <meta name="twitter:image" content="{OG_IMAGE}">
+  <meta name="twitter:image" content="{og_img}">
   <script type="application/ld+json">
 {ld}
   </script>
@@ -141,7 +162,7 @@ def shell(fname, title, body, desc):
   <title>{title}</title>
   <meta name="description" content="{desc}">
   <meta name="theme-color" content="#17474A">
-{seo_head(fname, title, desc)}  <link rel="icon" href="assets/web/mark.png">
+{seo_head(fname, title, desc)}{PRELOAD if fname == "index.html" else ""}  <link rel="icon" href="assets/web/mark.png">
   <link rel="apple-touch-icon" href="assets/web/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -301,7 +322,7 @@ index_body = f'''    <section class="hero">
           <span class="eyebrow">Βιογραφικό</span>
           <p class="lead">{intro[0]}</p>
           <p>{intro[1]}</p>
-          <a class="textlink" href="viografiko.html">Περισσότερα →</a>
+          <a class="textlink" href="viografiko.html" aria-label="Περισσότερα για το βιογραφικό">Περισσότερα →</a>
         </div>
       </div>
     </section>
@@ -312,19 +333,19 @@ index_body = f'''    <section class="hero">
           {ICON_EYE}
           <h3>Η Προσέγγιση</h3>
           <p>{card['Η Προσέγγιση']}</p>
-          <a class="textlink" href="proseggisi.html">Περισσότερα →</a>
+          <a class="textlink" href="proseggisi.html" aria-label="Περισσότερα για την προσέγγιση">Περισσότερα →</a>
         </article>
         <article class="service reveal">
           {ICON_TALK}
           <h3>Ψυχοθεραπεία</h3>
           <p>{psy_sentence}</p>
-          <a class="textlink" href="psychotherapeia.html">Περισσότερα →</a>
+          <a class="textlink" href="psychotherapeia.html" aria-label="Περισσότερα για την ψυχοθεραπεία και την ψυχανάλυση">Περισσότερα →</a>
         </article>
         <article class="service reveal">
           {ICON_PATH}
           <h3>Εποπτεία</h3>
           <p>{card['Εποπτεία']}</p>
-          <a class="textlink" href="epopteia.html">Περισσότερα →</a>
+          <a class="textlink" href="epopteia.html" aria-label="Περισσότερα για την εποπτεία">Περισσότερα →</a>
         </article>
       </div>
     </section>
@@ -348,8 +369,8 @@ index_body = f'''    <section class="hero">
         <a class="btn btn-mist" href="epikoinonia.html">Επικοινωνία</a>
       </div>
     </section>'''
-write('index.html', shell('index.html', 'Ψυχολόγος/ Ψυχοθεραπεύτρια στην Αθήνα — Δρ Ηλιοπούλου Τριανταφυλλιά', index_body,
-      'Δρ Ηλιοπούλου Τριανταφυλλιά, ψυχολόγος/ ψυχοθεραπεύτρια: ατομικές συνεδρίες ψυχοθεραπείας και ψυχανάλυσης (Daseinsanalysis) για ενήλικες στα Άνω Πατήσια της Αθήνας ή διαδικτυακά, και εποπτεία επαγγελματιών.'))
+write('index.html', shell('index.html', 'Ψυχολόγος/ Ψυχοθεραπεύτρια Αθήνα | Ηλιοπούλου Τριανταφυλλιά', index_body,
+      'Δρ Ηλιοπούλου Τριανταφυλλιά, ψυχολόγος/ ψυχοθεραπεύτρια: συνεδρίες ψυχοθεραπείας και ψυχανάλυσης (Daseinsanalysis) στα Άνω Πατήσια της Αθήνας ή διαδικτυακά.'))
 
 # ================================================================ VIOGRAFIKO
 bio = [clean(p) for p in plain_paras(main_of('viografiko').split('<section class="page-bottom')[0]) if 'class' not in p]
@@ -365,7 +386,7 @@ bio_body = page_hero('Βιογραφικό', NAME, SUBTITLE, img('profile', 'Π�
     </section>
 
 ''' + photo_band(img('office-5', 'Αντίκα γραφείο με ανοιχτό βιβλίο', sizes='1100px', pos='50% 55%'))
-write('viografiko.html', shell('viografiko.html', 'Βιογραφικό — Δρ Ηλιοπούλου Τριανταφυλλιά, Ψυχολόγος/ Ψυχοθεραπεύτρια', bio_body, 'Σπουδές (BSc, MSc, PhD), έρευνα, διδασκαλία και κλινική εμπειρία της Δρ. Τριανταφυλλιάς Ηλιοπούλου, ψυχοθεραπεύτριας με πενταετή εκπαίδευση στη Daseinsanalysis.'))
+write('viografiko.html', shell('viografiko.html', 'Βιογραφικό — Δρ Ηλιοπούλου Τριανταφυλλιά', bio_body, 'Σπουδές (BSc, MSc, PhD), έρευνα, διδασκαλία και κλινική εμπειρία της Δρ Ηλιοπούλου Τριανταφυλλιάς, ψυχοθεραπεύτριας με εκπαίδευση στη Daseinsanalysis.'))
 
 # ================================================================ PROSEGGISI
 prs_main = main_of('proseggisi')
@@ -383,7 +404,7 @@ prs_body = page_hero('Daseinsanalysis', 'Η Προσέγγιση', prs_sub, img(
     </section>
 
 ''' + photo_band(img('office-10', 'Τιρκουάζ πολυθρόνες και παραβάν', sizes='1100px', pos='50% 60%'))
-write('proseggisi.html', shell('proseggisi.html', 'Η Προσέγγιση — Daseinsanalysis, Φαινομενολογική Ψυχοθεραπεία', prs_body, 'Η Φαινομενολογική – Υπαρξιακή Ανάλυση &amp; Ψυχοθεραπεία (Daseinsanalysis): μια προσέγγιση που στηρίζεται στη συνομιλία, τον αναστοχασμό και την ερμηνευτική φαινομενολογία.'))
+write('proseggisi.html', shell('proseggisi.html', 'Η Προσέγγιση: Daseinsanalysis — Δρ Ηλιοπούλου', prs_body, 'Φαινομενολογική – Υπαρξιακή Ανάλυση &amp; Ψυχοθεραπεία (Daseinsanalysis): μια προσέγγιση που βασίζεται στη συνομιλία, τον αναστοχασμό και την ερμηνεία.'))
 
 # ================================================================ PSYCHOTHERAPEIA
 psy_main = main_of('psychotherapeia')
@@ -415,7 +436,7 @@ psy_body = page_hero('Υπηρεσίες', 'Ψυχοθεραπεία / Ψυχα�
     </section>
 
 ''' + photo_band(img('office-4', 'Γραφείο και σκάλα, άποψη από ψηλά', sizes='1100px', pos='50% 40%'))
-write('psychotherapeia.html', shell('psychotherapeia.html', 'Ψυχοθεραπεία / Ψυχανάλυση στην Αθήνα — Δρ Ηλιοπούλου Τριανταφυλλιά', psy_body, 'Ατομικές συνεδρίες ψυχοθεραπείας (45 λεπτά) ή ψυχανάλυσης (90 λεπτά) για ενήλικες, δια ζώσης στα Άνω Πατήσια ή διαδικτυακά. Άγχος, κατάθλιψη, πένθος, σχέσεις.'))
+write('psychotherapeia.html', shell('psychotherapeia.html', 'Ψυχοθεραπεία / Ψυχανάλυση Αθήνα — Δρ Ηλιοπούλου', psy_body, 'Ατομικές συνεδρίες ψυχοθεραπείας (45΄) ή ψυχανάλυσης (90΄) για ενήλικες, δια ζώσης στα Άνω Πατήσια ή διαδικτυακά. Άγχος, κατάθλιψη, πένθος, σχέσεις.'))
 
 # ================================================================ EPOPTEIA
 ep = [clean(p).replace('μέσω Skype', 'μέσω online πλατφόρμας').replace('διάρκεια 1 ώρας', 'διάρκεια 60 λεπτών').replace('διάρκεια 1,5 ώρα', 'διάρκεια 90 λεπτών').replace('το πως να', 'το πώς να') for p in plain_paras(main_of('epopteia')) if 'class' not in p]
@@ -434,7 +455,7 @@ ep_body = page_hero('Για επαγγελματίες', 'Εποπτεία', '',
     </section>
 
 ''' + photo_band(img('office-7', 'Παλιό μπαούλο και πίνακας στον τοίχο', sizes='1100px', pos='50% 30%'))
-write('epopteia.html', shell('epopteia.html', 'Εποπτεία για Ψυχοθεραπευτές — Δρ Ηλιοπούλου Τριανταφυλλιά', ep_body, 'Ατομική και ομαδική εποπτεία για επαγγελματίες ψυχοθεραπείας και ψυχανάλυσης, δια ζώσης ή διαδικτυακά, με στόχο τον αναστοχασμό και την επαγγελματική ανάπτυξη.'))
+write('epopteia.html', shell('epopteia.html', 'Εποπτεία Ψυχοθεραπευτών — Δρ Ηλιοπούλου Τριανταφυλλιά', ep_body, 'Ατομική και ομαδική εποπτεία για επαγγελματίες ψυχοθεραπείας και ψυχανάλυσης, δια ζώσης ή διαδικτυακά, με στόχο τον αναστοχασμό και την επαγγελματική ανάπτυξη.'))
 
 # ================================================================ DIMOSIEUSEIS
 dm_main = main_of('dimosieuseis')
@@ -463,7 +484,7 @@ dm_body = page_hero('Έρευνα', 'Δημοσιεύσεις', '', img('office-
     </section>
 
 ''' + photo_band(img('office-11', 'Λεπτομέρεια τοίχου', sizes='1100px', pos='50% 35%'))
-write('dimosieuseis.html', shell('dimosieuseis.html', 'Δημοσιεύσεις και Έρευνα — Δρ Ηλιοπούλου Τριανταφυλλιά', dm_body, 'Επιλεγμένες επιστημονικές δημοσιεύσεις και συμμετοχή σε ερευνητικά προγράμματα της Δρ. Τριανταφυλλιάς Ηλιοπούλου (2018–2022).'))
+write('dimosieuseis.html', shell('dimosieuseis.html', 'Δημοσιεύσεις και Έρευνα — Δρ Ηλιοπούλου Τριανταφυλλιά', dm_body, 'Επιλεγμένες επιστημονικές δημοσιεύσεις και συμμετοχή σε ερευνητικά προγράμματα της Δρ Ηλιοπούλου Τριανταφυλλιάς (2018–2022).'))
 
 # ================================================================ EPIKOINONIA
 MAPQ = '%CE%9F%CE%BB%CF%85%CE%BC%CF%80%CE%AF%CF%89%CE%BD+10+%CE%86%CE%BD%CF%89+%CE%A0%CE%B1%CF%84%CE%AE%CF%83%CE%B9%CE%B1+11143'
@@ -526,7 +547,7 @@ ct_body = f"""    <section class="contact-head">
         </div>
       </div>
     </section>"""
-write('epikoinonia.html', shell('epikoinonia.html', 'Επικοινωνία — Ραντεβού Ψυχοθεραπείας, Άνω Πατήσια Αθήνα', ct_body, 'Ολυμπίων 10, Άνω Πατήσια, Αθήνα 11143. Τηλέφωνα 2130475953 και 6978552358, email και φόρμα επικοινωνίας για ραντεβού ψυχοθεραπείας ή πληροφορίες.'))
+write('epikoinonia.html', shell('epikoinonia.html', 'Επικοινωνία — Ραντεβού Ψυχοθεραπείας, Άνω Πατήσια', ct_body, 'Ολυμπίων 10, Άνω Πατήσια, Αθήνα 11143. Τηλέφωνα 2130475953 και 6978552358, email και φόρμα επικοινωνίας για ραντεβού ψυχοθεραπείας ή πληροφορίες.'))
 
 
 # ================================================================ PRIVACY
