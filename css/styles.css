@@ -183,7 +183,9 @@ p,li,dd,address,.subtitle{line-height:var(--lh)}
 .site-footer a{color:#D4EAE8;text-decoration:none}
 .site-footer a:hover{color:#fff;text-decoration:underline}
 .site-footer address{font-style:normal;line-height:1.8}
-.copyright{padding-top:24px;font-size:.84rem;color:#B2CFCD;margin:0}
+.copyright{padding-top:24px;font-size:.84rem;color:#B2CFCD;margin:0;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 24px}
+.copyright .credit{opacity:.8}
+.copyright .credit a{text-decoration:underline;text-underline-offset:3px}
 @media(max-width:760px){.footer-grid{grid-template-columns:1fr}}
 
 /* ---------- inner pages ---------- */

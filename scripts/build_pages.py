@@ -221,7 +221,7 @@ def shell(fname, title, body, desc):
           </address>
         </div>
       </div>
-      <p class="copyright">© Τριανταφυλλιά Ηλιοπούλου — Όλα τα δικαιώματα διατηρούνται.</p>
+      <p class="copyright">© Τριανταφυλλιά Ηλιοπούλου — Όλα τα δικαιώματα διατηρούνται.<span class="credit">Design and development: <a href="mailto:angelosour@icloud.com">AngelD</a></span></p>
     </div>
   </footer>
 
