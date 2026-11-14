@@ -7,7 +7,7 @@ Run from the project root:  python3 scripts/build_pages.py
 """
 import os, re, subprocess
 
-ORIG = '34658eb'   # the commit that holds the original, pre-redesign pages. Do not change.
+ORIG = 'd2c5358'   # last commit before the redesign (original pages + the owner's Feb 2026 title/subtitle edits). Do not change.
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
 
@@ -92,12 +92,12 @@ def seo_head(fname, title, desc):
     person = {
         '@type': 'Person', '@id': SITE + '/#person',
         'name': 'Τριανταφυλλιά Ηλιοπούλου', 'honorificPrefix': 'Δρ.',
-        'jobTitle': 'Ψυχοθεραπεύτρια - Φαινομενολογικής & Υπαρξιακής Ανάλυσης',
+        'jobTitle': 'Ψυχολόγος/ Ψυχοθεραπεύτρια - Φαινομενολογικής & Υπαρξιακής Ανάλυσης',
         'image': SITE + '/assets/web/profile-800.jpg', 'url': SITE + '/viografiko.html',
         'worksFor': {'@id': SITE + '/#practice'},
     }
     graph = [org, person,
-             {'@type': 'WebSite', '@id': SITE + '/#website', 'url': SITE + '/', 'name': 'Τριανταφυλλιά Ηλιοπούλου — Ψυχοθεραπεύτρια', 'inLanguage': 'el'}]
+             {'@type': 'WebSite', '@id': SITE + '/#website', 'url': SITE + '/', 'name': 'Τριανταφυλλιά Ηλιοπούλου — Ψυχολόγος/ Ψυχοθεραπεύτρια', 'inLanguage': 'el'}]
     if fname != 'index.html':
         page_name = title.split(' — ')[0]
         graph.append({'@type': 'BreadcrumbList', 'itemListElement': [
@@ -112,7 +112,7 @@ def seo_head(fname, title, desc):
   <meta name="author" content="Τριανταφυλλιά Ηλιοπούλου">
   <meta property="og:type" content="{og_type}">
   <meta property="og:locale" content="el_GR">
-  <meta property="og:site_name" content="Τριανταφυλλιά Ηλιοπούλου — Ψυχοθεραπεύτρια">
+  <meta property="og:site_name" content="Τριανταφυλλιά Ηλιοπούλου — Ψυχολόγος/ Ψυχοθεραπεύτρια">
   <meta property="og:title" content="{t}">
   <meta property="og:description" content="{d}">
   <meta property="og:url" content="{url}">
@@ -176,7 +176,7 @@ def shell(fname, title, body, desc):
           <img src="assets/web/mark-white.png" alt="" width="54" height="50">
           <div>
             <strong>Δρ Ηλιοπούλου Τριανταφυλλιά</strong>
-            Ψυχοθεραπεύτρια - Φαινομενολογικής &amp; Υπαρξιακής Ανάλυσης
+            Ψυχολόγος/ Ψυχοθεραπεύτρια - Φαινομενολογικής &amp; Υπαρξιακής Ανάλυσης
           </div>
         </div>
         <nav aria-label="Footer navigation">
@@ -247,7 +247,7 @@ def write(fname, html):
 
 
 NAME = 'Δρ Ηλιοπούλου Τριανταφυλλιά'
-SUBTITLE = 'Ψυχοθεραπεύτρια - Φαινομενολογικής &amp; Υπαρξιακής Ανάλυσης'
+SUBTITLE = 'Ψυχολόγος/ Ψυχοθεραπεύτρια - Φαινομενολογικής &amp; Υπαρξιακής Ανάλυσης'   # owner's wording (Feb 2026 edit)
 
 # ================================================================ INDEX
 idx = main_of('index')
@@ -348,8 +348,8 @@ index_body = f'''    <section class="hero">
         <a class="btn btn-mist" href="epikoinonia.html">Επικοινωνία</a>
       </div>
     </section>'''
-write('index.html', shell('index.html', 'Ψυχοθεραπεύτρια στην Αθήνα — Δρ Ηλιοπούλου Τριανταφυλλιά', index_body,
-      'Δρ Ηλιοπούλου Τριανταφυλλιά, ψυχοθεραπεύτρια: ατομικές συνεδρίες ψυχοθεραπείας και ψυχανάλυσης (Daseinsanalysis) για ενήλικες στα Άνω Πατήσια της Αθήνας ή διαδικτυακά, και εποπτεία επαγγελματιών.'))
+write('index.html', shell('index.html', 'Ψυχολόγος/ Ψυχοθεραπεύτρια στην Αθήνα — Δρ Ηλιοπούλου Τριανταφυλλιά', index_body,
+      'Δρ Ηλιοπούλου Τριανταφυλλιά, ψυχολόγος/ ψυχοθεραπεύτρια: ατομικές συνεδρίες ψυχοθεραπείας και ψυχανάλυσης (Daseinsanalysis) για ενήλικες στα Άνω Πατήσια της Αθήνας ή διαδικτυακά, και εποπτεία επαγγελματιών.'))
 
 # ================================================================ VIOGRAFIKO
 bio = [clean(p) for p in plain_paras(main_of('viografiko').split('<section class="page-bottom')[0]) if 'class' not in p]
@@ -365,7 +365,7 @@ bio_body = page_hero('Βιογραφικό', NAME, SUBTITLE, img('profile', 'Π�
     </section>
 
 ''' + photo_band(img('office-5', 'Αντίκα γραφείο με ανοιχτό βιβλίο', sizes='1100px', pos='50% 55%'))
-write('viografiko.html', shell('viografiko.html', 'Βιογραφικό — Δρ Ηλιοπούλου Τριανταφυλλιά, Ψυχοθεραπεύτρια', bio_body, 'Σπουδές (BSc, MSc, PhD), έρευνα, διδασκαλία και κλινική εμπειρία της Δρ. Τριανταφυλλιάς Ηλιοπούλου, ψυχοθεραπεύτριας με πενταετή εκπαίδευση στη Daseinsanalysis.'))
+write('viografiko.html', shell('viografiko.html', 'Βιογραφικό — Δρ Ηλιοπούλου Τριανταφυλλιά, Ψυχολόγος/ Ψυχοθεραπεύτρια', bio_body, 'Σπουδές (BSc, MSc, PhD), έρευνα, διδασκαλία και κλινική εμπειρία της Δρ. Τριανταφυλλιάς Ηλιοπούλου, ψυχοθεραπεύτριας με πενταετή εκπαίδευση στη Daseinsanalysis.'))
 
 # ================================================================ PROSEGGISI
 prs_main = main_of('proseggisi')

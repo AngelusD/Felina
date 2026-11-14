@@ -12,7 +12,7 @@ DIST = 'dist'
 shutil.rmtree(DIST, ignore_errors=True)
 os.makedirs(DIST)
 
-files = glob.glob('*.html') + ['css/styles.css', 'js/main.js', 'sitemap.xml', 'robots.txt']
+files = glob.glob('*.html') + ['css/styles.css', 'js/main.js', 'sitemap.xml', 'robots.txt', 'CNAME']
 used = set()
 for f in glob.glob('*.html') + ['css/styles.css', 'js/main.js']:
     txt = open(f, encoding='utf-8').read()
